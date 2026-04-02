@@ -9,6 +9,8 @@ import datetime
 
 drops1 = 0
 drops2 = 0
+drop1_ct = []
+drop2_ct = []
 adc_data1 = []
 adc_data2 = []
 volts1 = []
@@ -50,7 +52,8 @@ def collect():
         drop_time1.append(1)
     else:
         drop_time1.append(0)
-        
+
+    drop1_ct.append(drops1)
     adc_data2.append(chan2.value)
     volts2.append(chan2.voltage)
     if noise_filter(chan2.value, adc_data2) == 1:
@@ -58,7 +61,8 @@ def collect():
         drop_time2.append(1)
     else:
         drop_time2.append(0)
-        
+
+    drop2_ct.append(drops2)
     dates.append(datetime.datetime.now().replace(microsecond=0))
     print("Raw ADC Value Channel 1: ", chan1.value)
     print("ADC Voltage Channel 1: " + str(chan1.voltage) + "V")
@@ -72,6 +76,6 @@ def collect():
 while True:
     collect()
 
-    df= pd.DataFrame(list(zip(dates, volts1, volts2, adc_data1, adc_data2, drop_time1, drop_time2)), columns = ["Datetime", "ADC Volts Ch1","ADC Volts Ch2", "ADC Values Ch1", "ADC Values Ch2", "Drops Ch1", "Drops Ch2"])
+    df= pd.DataFrame(list(zip(dates, volts1, volts2, adc_data1, adc_data2, drop_time1, drop_time2, drop1_ct, drop2_ct)), columns = ["Datetime", "ADC Volts Ch1","ADC Volts Ch2", "ADC Values Ch1", "ADC Values Ch2", "Drop Occurences Ch1", "Drop Occurences Ch2", "Cumulative Drops Ch1", "Cumulative Drops Ch2"])
 
     df.to_csv('precipitation.csv', index=False)
