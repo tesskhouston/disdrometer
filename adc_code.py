@@ -73,9 +73,6 @@ def collect():
     print("--------------------------")
     time.sleep(.1)
 
-while True:
-    collect()
-
+def dataframe():
     df= pd.DataFrame(list(zip(dates, volts1, volts2, adc_data1, adc_data2, drop_time1, drop_time2, drop1_ct, drop2_ct)), columns = ["Datetime", "ADC Volts Ch1","ADC Volts Ch2", "ADC Values Ch1", "ADC Values Ch2", "Drop Occurences Ch1", "Drop Occurences Ch2", "Cumulative Drops Ch1", "Cumulative Drops Ch2"])
-
     df.to_csv('precipitation.csv', index=False)
