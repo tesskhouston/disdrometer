@@ -63,7 +63,8 @@ def collect():
         drop_time2.append(0)
 
     drop2_ct.append(drops2)
-    dates.append(datetime.datetime.now().replace(microsecond=0))
+    dates.append(datetime.datetime.now())
+                 #.replace(microsecond=0))
     print("Raw ADC Value Channel 1: ", chan1.value)
     print("ADC Voltage Channel 1: " + str(chan1.voltage) + "V")
     print(drops1)
@@ -71,7 +72,7 @@ def collect():
     print("ADC Voltage Channel 2: " + str(chan2.voltage) + "V")
     print(drops2)
     print("--------------------------")
-    time.sleep(.1)
+    
 
 def dataframe():
     df= pd.DataFrame(list(zip(dates, volts1, volts2, adc_data1, adc_data2, drop_time1, drop_time2, drop1_ct, drop2_ct)), columns = ["Datetime", "ADC Volts Ch1","ADC Volts Ch2", "ADC Values Ch1", "ADC Values Ch2", "Drop Occurences Ch1", "Drop Occurences Ch2", "Cumulative Drops Ch1", "Cumulative Drops Ch2"])
