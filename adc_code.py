@@ -3,10 +3,8 @@ import digitalio
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
-import time
 import pandas as pd
 import datetime
-import gpiozero
 import numpy as np
 
 
@@ -101,85 +99,61 @@ prev_total_drops_sec = 0
 i=0
 sample_id = []
 
-
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
 cs = digitalio.DigitalInOut(board.D5)
-
 cs1 = digitalio.DigitalInOut(board.D6)
 
 mcp = MCP.MCP3008(spi, cs)
 mcp1 = MCP.MCP3008(spi, cs1)
 
-#yellow wire 1
 chan1 = AnalogIn(mcp, MCP.P0)
-
-#green wire 1
 chan2 = AnalogIn(mcp, MCP.P1)
-
-#yellow wire 2
 chan3 = AnalogIn(mcp, MCP.P2)
-
-#green wire 2
 chan4 = AnalogIn(mcp, MCP.P3)
-
-#yellow wire 3
 chan5 = AnalogIn(mcp, MCP.P4)
-
-#green wire 3
 chan6 = AnalogIn(mcp, MCP.P5)
-
-#yellow wire 4
 chan7 = AnalogIn(mcp, MCP.P6)
-
-#green wire 4
 chan8 = AnalogIn(mcp, MCP.P7)
 
 chan1_1 = AnalogIn(mcp1, MCP.P0)
-
 chan1_2 = AnalogIn(mcp1, MCP.P1)
-
 chan1_3 = AnalogIn(mcp1, MCP.P2)
-
 chan1_4 = AnalogIn(mcp1, MCP.P3)
-
 chan1_5 = AnalogIn(mcp1, MCP.P4)
-
 chan1_6 = AnalogIn(mcp1, MCP.P5)
-
 chan1_7 = AnalogIn(mcp1, MCP.P6)
-
 chan1_8 = AnalogIn(mcp1, MCP.P7)
 
 
 def noise_filter(va_data, vo_data, dropnum, dropdata, timedata):
-    """#approximate normal (unimpeded) values are around 61000
-    if data<45000 and channel[len(channel)-2]>45000:
-        return 1
-    else:
-        return 0"""
     global i
     start_ind = sample_id.index(i)
     end_ind = len(sample_id)-1
     sample_vaarray=[]
     sample_voarray=[]
+
     j=start_ind
     while end_ind>=j:
         sample_vaarray.append(va_data[j])
         sample_voarray.append(vo_data[j])
         j+=1
+        
     Q1Va=np.percentile(sample_vaarray, 25, method='midpoint')
     Q1Vo=np.percentile(sample_voarray, 25, method='midpoint')
     Q3Va=np.percentile(sample_vaarray, 75, method='midpoint')
     Q3Vo=np.percentile(sample_voarray, 75, method='midpoint')
     VaIQR = Q3Va-Q1Va
     VoIQR=Q3Vo-Q1Vo
-    lower_va=Q1Va-9*VaIQR
-    lower_vo=Q1Vo-2*VoIQR
-    #print(lower_va)
+    lower_va=Q1Va-8*VaIQR #8 was just the value that worked best
+    lower_vo=Q1Vo-8*VoIQR
+    
     j=start_ind
     while end_ind>=j:
-        if va_data[j]<=lower_va and va_data[j-1]>lower_va:
+        if va_data[j]<=lower_va and va_data[j-1]>lower_va and vo_data[j]>lower_vo:
+            dropnum+=1
+            timedata.append(1)
+        elif vo_data[j]<=lower_vo and vo_data[j-1]>lower_vo:
             dropnum+=1
             timedata.append(1)
         else:
@@ -279,34 +253,6 @@ def collect():
     total_drops_sec.append(prev_total_drops_sec)
     sample_id.append(i)
     
-
-    
-                 #.replace(microsecond=0))
-    
-    
-    """print("Raw ADC Value Channel 1: ", drops1)
-    print("Raw ADC Value Channel 2: ", drops2)
-    print("Raw ADC Value Channel 3: ", drops3)
-    print("Raw ADC Value Channel 4: ", drops4)
-    print("Raw ADC Value Channel 5: ", drops5)
-    print("Raw ADC Value Channel 6: ", drops6)
-    print("Raw ADC Value Channel 7: ", drops7)
-    print("Raw ADC Value Channel 8: ", drops8)
-    print("Raw ADC Value Channel 1_1: ", drops1_1)
-    print("Raw ADC Value Channel 1_2: ", drops1_2)
-    print("Raw ADC Value Channel 1_3: ", drops1_3)
-    print("Raw ADC Value Channel 1_4: ", drops1_4)
-    print("Raw ADC Value Channel 1_5: ", drops1_5)
-    print("Raw ADC Value Channel 1_6: ", drops1_6)
-    print("Raw ADC Value Channel 1_7: ", drops1_7)
-    print("Raw ADC Value Channel 1_8: ", drops1_8)"""
-    
-    """print("ADC Voltage Channel 1: " + str(chan1.voltage) + "V")
-    print(drops1)
-    print("Raw ADC Value Channel 2: ", chan2.value)
-    print("ADC Voltage Channel 2: " + str(chan2.voltage) + "V")
-    print(drops2)
-    print("--------------------------")"""
     
 def increase_i():
     global i
