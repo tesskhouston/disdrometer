@@ -1,14 +1,23 @@
 Raspberry Pi 5 pen laser optical disdrometer.
 
 Materials:
+
 MCP3008 (x2) ADC 
+
 SFH 203 P (x16) Photodiode
+
 VLM-650-03 (x16) lasers OR 1054 (x16) lasers
+
 10kΩ carbon film 5% resistor (x16)
+
 Raspberry Pi 5 (x1)
+
 Adafruit T-Cobbler Plus for Raspberry Pi (x1)
+
 Male-female wires
+
 Male-male wires
+
 Battery (discussed below)
 
 Wiring:
